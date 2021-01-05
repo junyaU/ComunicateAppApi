@@ -7,6 +7,13 @@
 // @LicenseUrl http://www.apache.org/licenses/LICENSE-2.0.html
 package routers
 
-func init() {
+import (
+	"NativeAppApi/controllers"
 
+	"github.com/astaxie/beego"
+)
+
+func init() {
+	beego.Router("/test", &controllers.UserController{}, "get:Test")
+	beego.Router("/sendSns", &controllers.SnsController{}, "get:SendMessage")
 }
