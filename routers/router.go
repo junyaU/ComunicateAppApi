@@ -14,6 +14,7 @@ import (
 )
 
 func init() {
-	beego.Router("/test", &controllers.UserController{}, "get:Test")
-	beego.Router("/sendSns", &controllers.SnsController{}, "get:SendMessage")
+	beego.Router("/sendSms", &controllers.SmsController{}, "post:SendMessage")
+	beego.Router("/userNameCheck/:userName:string", &controllers.UserController{}, "get:CheckUsenameExists")
+	beego.Router("/createUser", &controllers.UserController{}, "post:CreateNewUser")
 }
