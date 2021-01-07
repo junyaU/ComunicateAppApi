@@ -3,6 +3,8 @@ package controllers
 import (
 	"log"
 
+	"math/rand"
+
 	"github.com/astaxie/beego"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -10,7 +12,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
-type SnsController struct {
+type SmsController struct {
 	beego.Controller
 }
 
@@ -38,18 +40,26 @@ func createInputMessage(Message, PhoneNumber string) *sns.PublishInput {
 	return pin
 }
 
-func (this *SnsController) SendMessage() {
-	client, err := GetClient(beego.AppConfig.String("AccessKey"), beego.AppConfig.String("SecretKey"), beego.AppConfig.String("Region"))
-	if err != nil {
-		log.Println(err)
+func (this *SmsController) SendMessage() {
+	userPhoneNumber := this.GetString("phoneNumber")
+	client, _ := GetClient(beego.AppConfig.String("AccessKey"), beego.AppConfig.String("SecretKey"), beego.AppConfig.String("Region"))
+
+	randamNum := RandNum(6)
+	msgContent := "TeDeの確認コードは次の通りです : " + randamNum
+	msg := createInputMessage(msgContent, "+81"+userPhoneNumber)
+
+	client.Publish(msg)
+
+	this.Data["json"] = randamNum
+	this.ServeJSON()
+}
+
+var ints = []rune("1234567890")
+
+func RandNum(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = ints[rand.Intn(len(ints))]
 	}
-	msg := createInputMessage("これはてすとめっせ", "+81")
-
-	reasult, err := client.Publish(msg)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	log.Println(reasult)
+	return string(b)
 }
