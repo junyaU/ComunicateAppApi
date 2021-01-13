@@ -17,4 +17,5 @@ func init() {
 	beego.Router("/sendSms", &controllers.SmsController{}, "post:SendMessage")
 	beego.Router("/userNameCheck/:userName:string", &controllers.UserController{}, "get:CheckUsenameExists")
 	beego.Router("/createUser", &controllers.UserController{}, "post:CreateNewUser")
+	beego.Router("/login", &controllers.UserController{}, "post:Login")
 }
