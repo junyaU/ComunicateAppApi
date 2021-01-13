@@ -9,6 +9,7 @@ type User struct {
 	Birthday    time.Time `orm:"size(100)"`
 	PhoneNumber string    `orm:"size(40)"`
 	Password    string    `orm:"size(100)"`
+	JwtToken    string    `orm:"null;size(350)"`
 	Created     time.Time `orm:"auto_now_add;type(datetime)"`
 	Updated     time.Time `orm:"auto_now;type(datetime)"`
 }

@@ -44,11 +44,14 @@ func (this *UserController) CreateNewUser() {
 	layout := "2006-01-02"
 	parseBarthday, _ := time.Parse(layout, birthday)
 
+	jwtToken := IssueJWT(userName, phoneNum, parseBarthday)
+
 	user := models.User{}
 	user.UserName = userName
 	user.PhoneNumber = phoneNum
 	user.Password = hashPassword
 	user.Birthday = parseBarthday
+	user.JwtToken = jwtToken
 
 	o := orm.NewOrm()
 	_, err := o.Insert(&user)
@@ -56,7 +59,28 @@ func (this *UserController) CreateNewUser() {
 		return
 	}
 
-	jwtToken := IssueJWT(userName, phoneNum, parseBarthday)
+	this.Data["json"] = jwtToken
+	this.ServeJSON()
+}
+
+func (this *UserController) Login() {
+	phoneNum := this.GetString("phoneNum")
+	password := this.GetString("password")
+
+	user := models.User{PhoneNumber: phoneNum}
+	o := orm.NewOrm()
+	if err := o.Read(&user, "PhoneNumber"); err != nil {
+		return
+	}
+
+	passwordError := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if passwordError != nil {
+		return
+	}
+
+	jwtToken := IssueJWT(user.UserName, user.PhoneNumber, user.Birthday)
+	user.JwtToken = jwtToken
+	o.Update(&user, "JwtToken")
 	this.Data["json"] = jwtToken
 	this.ServeJSON()
 }
